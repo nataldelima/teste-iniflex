@@ -1,6 +1,5 @@
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -27,87 +26,86 @@ public class App {
                 .add(new Funcionario("Heloísa", LocalDate.of(2003, 5, 24), new BigDecimal("1606.85"), "Eletricista"));
         funcionarios.add(new Funcionario("Helena", LocalDate.of(1996, 9, 2), new BigDecimal("2799.93"), "Gerente"));
 
-        System.out.println("## Lista de Funcionários");
-        funcionarios.forEach(System.out::println);
+        // funcionarios.forEach(System.out::println);
 
         // 3.2 - Remover o funcionário "João" da lista
         funcionarios.removeIf(f -> f.getNome().equals("João"));
 
         // 3.3 - Imprimir todos os funcionários com suas informações
-        System.out.println("\n## Funcionários com Detalhes");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        funcionarios.forEach(f -> {
-            System.out.println(f.getNome() + " - " + f.getFuncao() + ": ");
-            System.out.println("Data de Nascimento: " + f.getDataNascimento().format(formatter));
-            System.out.println(
-                    "Salário: R$" + f.getSalario().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace(".", ","));
-            System.out.println("----------");
-        });
+        System.out.println("\n## LISTA DE FUNCIONÁRIOS");
+        funcionarios.forEach(System.out::println);
 
         // 3.4 - Aumentar o salário dos funcionários em 10%
         funcionarios.forEach(f -> f.setSalario(f.getSalario().multiply(new BigDecimal("1.1"))));
+        funcionarios.forEach(System.out::println);
 
         // 3.5 - Agrupar os funcionários por função em um MAP
-        System.out.println("\n## Funcionários por Função");
+        System.out.println("\n## FUNCIONÁRIOS POR FUNÇÃO");
         Map<String, List<Funcionario>> funcionariosPorFuncao = funcionarios.stream()
                 .collect(Collectors.groupingBy(Funcionario::getFuncao));
 
         funcionariosPorFuncao.forEach((funcao, funcionariosFuncao) -> {
-            System.out.println("\nFunção: " + funcao);
+            System.out.println("\n############# " + funcao.toUpperCase() + " #############");
             funcionariosFuncao.forEach(System.out::println);
         });
 
         // 3.6 - Imprimir os funcionários que fazem aniversário no mês 10 ou 12
-        System.out.println("\n## Funcionários com Aniversário em Outubro ou Dezembro");
+        System.out.println("\n## FUNCIONÁRIOS ANIVERSARIANTES E OUTUBRO E DEZEMBRO");
         List<Funcionario> aniversariantesOutubroDezembro = funcionarios.stream()
-                .filter(f -> f.getDataNascimento().getMonthValue() == 10 || f.getDataNascimento().getMonthValue() == 12)
+                .filter(f -> f.getDataNascimento().getMonthValue() == 10 ||
+                        f.getDataNascimento().getMonthValue() == 12)
                 .collect(Collectors.toList());
 
         if (aniversariantesOutubroDezembro.isEmpty()) {
             System.out.println("Não há funcionários com aniversário em outubro ou dezembro.");
         } else {
-            System.out.println(aniversariantesOutubroDezembro);
+            aniversariantesOutubroDezembro.forEach(System.out::println);
         }
 
         // 3.7 - Imprimir o funcionário com a maior idade
-        System.out.println("\n## Funcionário com Maior Idade");
+        System.out.println("\n## FUNCIONARIO COM MAIOR IDADE");
         Funcionario funcionarioMaisIdade = funcionarios.stream()
-                .max(Comparator.comparingInt(f -> f.getDataNascimento().getYear()))
+                .min(Comparator.comparingInt(f -> f.getDataNascimento().getYear()))
                 .orElse(null);
 
-        if (funcionarioMaisIdade != null) {
-            System.out.println(funcionarioMaisIdade.getNome() + " ("
-                    + calcularIdade(funcionarioMaisIdade.getDataNascimento()) + " anos)");
-        } else {
-            System.out.println("Não foi possível identificar o funcionário com maior idade.");
-        }
+        System.out.println(funcionarioMaisIdade.getNome() + " tem "
+                + calcularIdade(funcionarioMaisIdade.getDataNascimento()) + " anos");
 
         // 3.8 - Imprimir a lista de funcionários por ordem alfabética
-        System.out.println("\n## Funcionários por Ordem Alfabética");
+        System.out.println("\n## FUNCIONÁRIOS POR ORDEM ALFABÉTICA");
         List<Funcionario> funcionariosOrdenados = new ArrayList<>(funcionarios);
         funcionariosOrdenados.sort(Comparator.comparing(Funcionario::getNome));
         funcionariosOrdenados.forEach(System.out::println);
 
         // 3.9 - Imprimir o total dos salários dos funcionários
-        System.out.println("\n## Total de Salários");
+        System.out.println("\n## TOTAL DA FOLHA DE PAGAMENTO");
         BigDecimal totalSalarios = funcionarios.stream()
                 .map(Funcionario::getSalario)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        System.out.println("R$" + totalSalarios.setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace(".", ","));
+        System.out.println("R$" + totalSalarios.setScale(2,
+                BigDecimal.ROUND_HALF_UP).toString().replace(".", ","));
 
         // 3.10 - Imprimir quantos salários mínimos ganha cada funcionário
-        System.out.println("\n## Quantidade de Salários Mínimos por Funcionário");
+        System.out.println("\n## QUANTIDADE DE SALÁRIOS MÍNIMOS POR FUNCIONÁRIOS");
         BigDecimal salarioMinimo = new BigDecimal("1212.00");
+        System.out.println("Salário mínimo vigente: R$"
+                + salarioMinimo.setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace(".", ","));
+
         funcionarios.forEach(f -> {
             int salariosMinimos = f.getSalario().divideToIntegralValue(salarioMinimo).intValue();
-            System.out.println(f.getNome() + ": " + salariosMinimos + " salários mínimos");
+            String textoSalarioMinimo;
+            if (salariosMinimos <= 1)
+                textoSalarioMinimo = " salário mínimo.";
+            else
+                textoSalarioMinimo = " salários mínimos.";
+            System.out.println(f.getNome() + " ganha " + salariosMinimos + textoSalarioMinimo);
         });
+
     }
 
     private static int calcularIdade(LocalDate dataNascimento) {
         LocalDate dataAtual = LocalDate.now();
         return dataAtual.getYear() - dataNascimento.getYear();
     }
-
 }

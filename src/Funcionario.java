@@ -1,4 +1,5 @@
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.math.BigDecimal;
 
 public class Funcionario extends Pessoa {
@@ -30,7 +31,10 @@ public class Funcionario extends Pessoa {
 
     @Override
     public String toString() {
-        return "Funcionario [salario=" + salario + ", funcao=" + funcao + "]";
+        return "\nNome: " + getNome() + "\nData de nascimento: "
+                + getDataNascimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\nSalário: R$"
+                + getSalario().setScale(2, BigDecimal.ROUND_HALF_UP).toString().replace(".", ",") + "\nFunção: "
+                + getFuncao() + "\n-------------------------------------";
     }
 
 }
